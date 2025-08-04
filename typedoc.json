@@ -1,0 +1,23 @@
+{
+  "name": "MegaStack",
+  "includeVersion": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeExternals": true,
+  "excludeInternal": true,
+  "disableSources": true,
+  "hideGenerator": true,
+  "visibilityFilters": {
+    "inherited": true,
+    "protected": false
+  },
+  "navigation": {
+    "includeFolders": false
+  },
+  "sortEntryPoints": false,
+  "readme": "none",
+  "tsconfig": "./tsconfig.build.json",
+  "entryPoints": ["./src/main/index.ts"],
+  "externalSymbolLinkMappings": {},
+  "plugin": ["typedoc-plugin-mdn-links"]
+}

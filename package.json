@@ -1,0 +1,64 @@
+{
+  "name": "megastack",
+  "version": "0.0.0",
+  "description": "The ultimate stack for true web outlaws.",
+  "type": "module",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "bin": "./bin/megastack.js",
+  "exports": {
+    ".": "./index.js",
+    "./ssr": "./ssr/index.js",
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json && cp -R src/template lib/template && rimraf --glob 'lib/bin/**/*.d.ts' lib/template/node_modules lib/template/build lib/template/package-lock.json && cp package.json README.md LICENSE.txt lib/ && cd lib && npm pkg delete scripts devDependencies",
+    "clean": "rimraf lib docs coverage",
+    "test": "vitest run",
+    "test:definitions": "tsd --typings lib/index.d.ts --files src/main/ssr/global.d.ts --files 'src/test/**/*.test-d.ts'",
+    "perf": "toofast",
+    "docs": "typedoc",
+    "postinstall": "ln -nsf ../lib node_modules/megastack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smikhalevski/megastack.git"
+  },
+  "keywords": [
+    "web",
+    "stack"
+  ],
+  "author": "Savva Mikhalevski <smikhalevski@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/smikhalevski/megastack/issues"
+  },
+  "homepage": "https://github.com/smikhalevski/megastack#readme",
+  "devDependencies": {
+    "@types/node": "^24.2.0",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "prettier": "^3.6.2",
+    "rimraf": "^6.0.1",
+    "tsd": "^0.32.0",
+    "tslib": "^2.8.1",
+    "typedoc": "^0.28.9",
+    "typedoc-plugin-mdn-links": "^5.0.7",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-corsair": "^0.0.10-next.d2f9c35",
+    "react-dom": ">=18.0.0",
+    "react-executor": "^0.0.25-next.b8e5b7a"
+  },
+  "dependencies": {
+    "chalk": "^5.5.0",
+    "mime": "^4.0.7"
+  }
+}
