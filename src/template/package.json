@@ -11,6 +11,9 @@
     "typecheck": "tsc",
     "dev": "vite"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
     "@types/html-minifier-terser": "^7.0.2",
     "autoprefixer": "^10.4.21",
