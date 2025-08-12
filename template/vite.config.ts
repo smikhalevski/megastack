@@ -19,9 +19,9 @@ export default defineConfig(env => {
       rollupOptions: {
         input: env.isSsrBuild ? './src/main/server.ts' : './src/main/index.html',
         output: {
-          entryFileNames: env.isSsrBuild ? 'server.js' : '[hash].js',
-          chunkFileNames: '[hash].js',
-          assetFileNames: '[hash].[ext]',
+          entryFileNames: env.isSsrBuild ? 'server.js' : '[name]-[hash].js',
+          chunkFileNames: env.isSsrBuild ? '[name].js' : '[name]-[hash].js',
+          assetFileNames: '[name]-[hash].[ext]',
           manualChunks(id) {
             if (id.includes('node_modules')) {
               return 'vendor';

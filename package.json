@@ -18,7 +18,7 @@
   },
   "sideEffects": false,
   "scripts": {
-    "build": "tsc --project tsconfig.build.json && cp -R src/template lib/template && rimraf --glob 'lib/bin/**/*.d.mts' lib/template/node_modules lib/template/build lib/template/package-lock.json && cp package.json README.md LICENSE.txt lib/ && cd lib && npm pkg delete scripts devDependencies",
+    "build": "tsc --project tsconfig.build.json && cp -R template lib/template && rimraf --glob 'lib/bin/**/*.d.mts' lib/template/node_modules lib/template/build lib/template/package-lock.json && cp package.json README.md LICENSE.txt lib/ && cd lib && npm pkg delete scripts devDependencies",
     "clean": "rimraf lib docs coverage",
     "test": "vitest run",
     "test:definitions": "tsd --typings lib/index.d.ts --files src/main/ssr/global.d.ts --files 'src/test/**/*.test-d.ts'",

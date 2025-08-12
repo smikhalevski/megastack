@@ -1,8 +1,8 @@
-import React, { ComponentType, StrictMode } from 'react';
+import React, { ComponentType } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import { createBrowserHistory, History, HistoryOptions, HistoryProvider } from 'react-corsair/history';
 import { hydrateRouter, Outlet, Router, RouterOptions, RouterProvider } from 'react-corsair';
-import { ManifestChunk, ManifestProvider } from './useManifest.js';
+import { ManifestProvider } from './useManifest.js';
 import { ExecutorManager, ExecutorManagerProvider, hydrateExecutorManager } from 'react-executor';
 
 export interface MegaStackClient {
@@ -32,22 +32,16 @@ export function startMegaStackClient<Context>(options: MegaStackClientOptions<Co
     }
   });
 
-  const bootstrapChunks = Array.from(
-    document.head.querySelectorAll<HTMLLinkElement>('link[rel="text/css"]')
-  ).map<ManifestChunk>(link => ({ type: 'css', url: link.href }));
-
   const rootElement = (
-    <StrictMode>
-      <HistoryProvider value={history}>
-        <RouterProvider value={router}>
-          <ExecutorManagerProvider value={executorManager}>
-            <ManifestProvider value={{ bootstrapChunks, preloadedChunks: [] }}>
-              <Root />
-            </ManifestProvider>
-          </ExecutorManagerProvider>
-        </RouterProvider>
-      </HistoryProvider>
-    </StrictMode>
+    <HistoryProvider value={history}>
+      <RouterProvider value={router}>
+        <ExecutorManagerProvider value={executorManager}>
+          <ManifestProvider value={{ bootstrapChunks: [], preloadedChunks: [] }}>
+            <Root />
+          </ManifestProvider>
+        </ExecutorManagerProvider>
+      </RouterProvider>
+    </HistoryProvider>
   );
 
   if (isHydrated) {

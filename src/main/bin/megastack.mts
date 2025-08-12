@@ -8,73 +8,93 @@ import { execSync } from 'node:child_process';
 // @ts-ignore
 import megastackPackageJSON from '../package.json' with { type: 'json' };
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
 const argv = process.argv.slice(2);
 
-if (argv.length === 0 || argv[0] !== 'init') {
-  console.log(`Create a MegaStack project in the current directory
+const TEMPLATE_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '../template');
+
+const TARGET_DIR = process.cwd();
+
+const PROJECT_NAME = argv[1] !== undefined ? argv[1] : path.basename(TARGET_DIR);
+
+const TOTAL_STEP_COUNT = 4;
+
+let stepIndex = 1;
+
+echo(`
+▄▄ ▄  ▄▄▄ ▄▄▄  ▄ 
+█ █ █ █▄  █ ▄ █▄█
+█ █ █ █▄▄ █▄▀ █ █
+
+`);
+
+if (argv[0] !== 'init') {
+  echo(`Creates a new project in the current directory.
 
 Usage:
-megastack init [[@scope/]<package-name>]`);
+${decorateCmd('megastack init')} [<package-name>]
+
+Go to ${decorateLink('https://megastack.dev')} for API docs and tutorials.
+`);
 
   process.exit(0);
 }
 
-const TARGET_DIR = process.cwd();
-
 if ((await fs.readdir(TARGET_DIR)).length !== 0) {
-  logError(`The directory must be empty.`);
+  echo(decorateError('The directory must be empty.'));
   process.exit(1);
 }
 
-console.log(
-  chalk.inverse(`
- ▄▄ ▄  ▄▄▄ ▄▄▄  ▄  
- █ █ █ █▄  █ ▄ █▄█ 
- █ █ █ █▄▄ █▄▀ █ █ 
-                   
-`)
-);
+echo(decorateTitle(stepIndex++, TOTAL_STEP_COUNT, 'Copying project files\n'));
 
-logInfo('Copying project files\n');
-
-await fs.cp(path.join(__dirname, '../template'), TARGET_DIR, { recursive: true });
+await fs.cp(TEMPLATE_DIR, TARGET_DIR, { recursive: true });
 
 const packageJSON = JSON.parse(await fs.readFile('package.json', 'utf8'));
 
+packageJSON.name = PROJECT_NAME;
 packageJSON.dependencies.megastack = '^' + megastackPackageJSON.version;
-
-if (argv[1] !== undefined) {
-  packageJSON.name = argv[1];
-}
 
 await fs.writeFile('package.json', JSON.stringify(packageJSON, null, 2));
 
-logInfo('Installing dependencies');
+echo(decorateTitle(stepIndex++, TOTAL_STEP_COUNT, 'Installing dependencies'));
 
 execSync('npm install --no-fund', { stdio: 'inherit' });
 
-logInfo('\nBuilding project');
+echo('\n' + decorateTitle(stepIndex++, TOTAL_STEP_COUNT, 'Building project\n'));
 
-execSync('npm run build', { stdio: 'inherit' });
+execSync('npm run --silent build', { stdio: 'inherit' });
 
-console.log(`
-${chalk.bold.green('Project created')}
+echo(`
+${decorateTitle(stepIndex++, TOTAL_STEP_COUNT, 'Project is ready')}
 
-Run ${chalk.bold.white('`npm run dev`')} to start the dev server with hot reload.
+Go to ${decorateLink('https://megastack.dev')} for API docs and tutorials.
 
-Run ${chalk.bold.white('`npm run build`')} to build the project.
+Install Devtools ${decorateLink('https://megastack.dev/react-executor#devtools')} extension for Chrome.
 
-Run ${chalk.bold.white('`npm run preview`')} to start the preview server of the static site.
+Run ${decorateCmd('npm run dev')} to start the dev server with hot reload.
 
-Run ${chalk.bold.white('`npm run preview-ssr`')} to start the preview server with SSR.
+Run ${decorateCmd('npm run build')} to build the project.
+
+Run ${decorateCmd('npm run preview')} to start the static site server.
+
+Run ${decorateCmd('npm run preview-ssr')} to start the SSR server.
 `);
 
-function logError(message: string): void {
-  console.log(chalk.bgRed.white(' ERROR ') + ' ' + message);
+function echo(message: string): void {
+  console.log(message);
 }
 
-function logInfo(message: string): void {
-  console.log(chalk.bold.blue(message));
+function decorateLink(url: string): string {
+  return chalk.blue.underline(url);
+}
+
+function decorateError(message: string): string {
+  return chalk.bgRed.white(' ERROR ') + ' ' + message;
+}
+
+function decorateTitle(index: number, totalCount: number, message: string): string {
+  return chalk.magenta.inverse(` ${index}/${totalCount} `) + ' ' + chalk.bold.magenta(message);
+}
+
+function decorateCmd(cmd: string): string {
+  return chalk.bold(cmd);
 }

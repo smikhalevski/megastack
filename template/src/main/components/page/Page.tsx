@@ -5,5 +5,5 @@ export interface PageProps {
 }
 
 export function Page(props: PageProps): ReactNode {
-  return <body>{props.children}</body>;
+  return <>{props.children}</>;
 }

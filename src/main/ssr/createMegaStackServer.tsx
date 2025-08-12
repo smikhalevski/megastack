@@ -1,4 +1,4 @@
-import React, { ComponentType, StrictMode } from 'react';
+import React, { ComponentType } from 'react';
 import { createServer, Server } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { renderToReadableStream } from 'react-dom/server.browser';
@@ -99,19 +99,17 @@ export function createMegaStackServer<Context>(options: MegaStackServerOptions<C
     });
 
     const stream = await renderToReadableStream(
-      <StrictMode>
-        <HistoryProvider value={history}>
-          <RouterProvider value={router}>
-            <ExecutorManagerProvider value={executorManager}>
-              <ManifestProvider value={manifest}>
-                <ScriptInjectorProvider value={scriptInjector}>
-                  <Root />
-                </ScriptInjectorProvider>
-              </ManifestProvider>
-            </ExecutorManagerProvider>
-          </RouterProvider>
-        </HistoryProvider>
-      </StrictMode>,
+      <HistoryProvider value={history}>
+        <RouterProvider value={router}>
+          <ExecutorManagerProvider value={executorManager}>
+            <ManifestProvider value={manifest}>
+              <ScriptInjectorProvider value={scriptInjector}>
+                <Root />
+              </ScriptInjectorProvider>
+            </ManifestProvider>
+          </ExecutorManagerProvider>
+        </RouterProvider>
+      </HistoryProvider>,
       {
         nonce,
         bootstrapModules,
@@ -120,5 +118,7 @@ export function createMegaStackServer<Context>(options: MegaStackServerOptions<C
     );
 
     await stream.pipeThrough(headersInjector).pipeThrough(chunkInjector).pipeTo(Writable.toWeb(response));
+
+    response.end();
   });
 }
