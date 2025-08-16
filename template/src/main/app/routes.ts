@@ -1,33 +1,17 @@
 import { createRoute } from 'react-corsair';
 
-export const feedRoute = createRoute({
+export const repositoriesRoute = createRoute({
   pathname: '/',
-  lazyComponent: () => import('./feed/FeedPage.js'),
+  lazyComponent: () => import('./repositories/RepositoriesPage.js'),
 });
 
-export const productRoute = createRoute<{ id: string }, number>({
-  pathname: '/product/:id',
-  lazyComponent: () => import('./product/ProductPage.js'),
-  dataLoader: () => {
-    return new Promise(resolve => {
-      console.log('Loading productRoute');
-
-      setTimeout(resolve, 1000, 222);
-    });
-  },
+export const repositoryRoute = createRoute<{ slug: string }>({
+  pathname: '/repository/:slug*',
+  lazyComponent: () => import('./repositories/RepositoryPage.js'),
 });
 
-export const productDetailsRoute = createRoute(productRoute, {
-  pathname: '/details',
-  lazyComponent: () => import('./product/ProductDetailsPage.js'),
-  dataLoader: () => {
-    return new Promise((resolve, reject) => {
-      console.log('Loading productDetailsRoute');
-
-      setTimeout(resolve, 2000, 222);
-    });
-  },
-  loadingComponent: () => 'Loading product details',
+export const repositoryInfoRoute = createRoute(repositoryRoute, {
+  lazyComponent: () => import('./repositories/RepositoryInfoPage.js'),
 });
 
-export const routes = [feedRoute, productRoute, productDetailsRoute];
+export const routes = [repositoriesRoute, repositoryInfoRoute];

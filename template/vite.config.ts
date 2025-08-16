@@ -62,8 +62,8 @@ export default defineConfig(env => {
         },
       },
     ],
-    // define: {
-    //   'process.env.NODE_ENV': '"development"',
-    // },
+    define: {
+      'process.env.NODE_ENV': '"development"',
+    },
   };
 });

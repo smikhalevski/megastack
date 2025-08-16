@@ -1,9 +1,23 @@
 :root {
-  --fontStack:
+  --font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
     'Segoe UI Emoji', sans-serif;
+
+  --font-family-monospace: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
 }
 
 body {
-  font: normal normal 16px / 24px var(--fontStack);
+  padding: 2rem;
+  margin: 0;
+  font: normal normal 16px / 24px var(--font-family);
+}
+
+pre {
+  font: normal normal 14px / 24px var(--font-family-monospace);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+button {
+  font: inherit;
 }

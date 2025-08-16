@@ -22,5 +22,11 @@
     "postcss-nested": "^7.0.2",
     "vite": "^7.0.6"
   },
-  "dependencies": {}
+  "dependencies": {
+    "react": "^19.1.1",
+    "react-corsair": "0.0.10-next.d2f9c35",
+    "react-dom": "^19.1.1",
+    "react-executor": "0.0.25-next.b8e5b7a",
+    "react-hookers": "^6.3.0"
+  }
 }

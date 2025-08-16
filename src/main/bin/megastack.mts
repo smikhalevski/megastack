@@ -7,80 +7,146 @@ import chalk from 'chalk';
 import { execSync } from 'node:child_process';
 // @ts-ignore
 import megastackPackageJSON from '../package.json' with { type: 'json' };
+import { parseArgs } from 'argcat';
+import * as d from 'doubter';
 
-const argv = process.argv.slice(2);
+const argsShape = d.object({
+  packageManager: d.string().coerce().optional('npm'),
+
+  packageName: d.string().coerce().optional(),
+
+  outputDir: d.string().coerce().optional(process.cwd()),
+
+  force: d.boolean().optional(false),
+
+  silent: d.boolean().optional(false),
+
+  help: d.boolean().optional(false),
+
+  '': d.array(d.string()),
+});
+
+const args = argsShape.parse(parseArgs(process.argv.slice(2), { flags: ['force', 'silent', 'help'] }));
 
 const TEMPLATE_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '../template');
+const OUTPUT_DIR = path.resolve(args.outputDir);
+const PACKAGE_MANAGER = args.packageManager;
+const PACKAGE_NAME = args.packageName || path.basename(OUTPUT_DIR);
+const IS_SILENT = args.silent;
+const IS_HELP = args.help;
+const IS_FORCE = args.force;
 
-const TARGET_DIR = process.cwd();
-
-const PROJECT_NAME = argv[1] !== undefined ? argv[1] : path.basename(TARGET_DIR);
-
-const TOTAL_STEP_COUNT = 4;
-
-let stepIndex = 1;
-
-echo(`
+const LOGO = `
 ▄▄ ▄  ▄▄▄ ▄▄▄  ▄ 
 █ █ █ █▄  █ ▄ █▄█
 █ █ █ █▄▄ █▄▀ █ █
+`;
 
-`);
+process.exit(await runCommand(args[''][0]));
 
-if (argv[0] !== 'init') {
-  echo(`Creates a new project in the current directory.
+async function runCommand(command: string): Promise<number> {
+  if (IS_HELP) {
+    return runHelpCommand();
+  }
 
-Usage:
-${decorateCmd('megastack init')} [<package-name>]
+  switch (command) {
+    case 'init':
+      return runInitCommand();
 
-Go to ${decorateLink('https://megastack.dev')} for API docs and tutorials.
-`);
-
-  process.exit(0);
+    default:
+      return runHelpCommand();
+  }
 }
 
-if ((await fs.readdir(TARGET_DIR)).length !== 0) {
-  echo(decorateError('The directory must be empty.'));
-  process.exit(1);
-}
+async function runInitCommand(): Promise<number> {
+  echo(LOGO);
 
-echo(decorateTitle(stepIndex++, TOTAL_STEP_COUNT, 'Copying project files\n'));
+  await fs.mkdir(OUTPUT_DIR, { recursive: true });
 
-await fs.cp(TEMPLATE_DIR, TARGET_DIR, { recursive: true });
+  if (!IS_FORCE && (await fs.readdir(OUTPUT_DIR)).length !== 0) {
+    echo(decorateError('The output directory must be empty.'));
+    return 1;
+  }
 
-const packageJSON = JSON.parse(await fs.readFile('package.json', 'utf8'));
+  const stepCount = 4;
 
-packageJSON.name = PROJECT_NAME;
-packageJSON.dependencies.megastack = '^' + megastackPackageJSON.version;
+  let stepIndex = 1;
 
-await fs.writeFile('package.json', JSON.stringify(packageJSON, null, 2));
+  echo(decorateStep(stepIndex++, stepCount, 'Copying project files\n'));
 
-echo(decorateTitle(stepIndex++, TOTAL_STEP_COUNT, 'Installing dependencies'));
+  await fs.cp(TEMPLATE_DIR, OUTPUT_DIR, { recursive: true, force: IS_FORCE });
 
-execSync('npm install --no-fund', { stdio: 'inherit' });
+  process.chdir(OUTPUT_DIR);
 
-echo('\n' + decorateTitle(stepIndex++, TOTAL_STEP_COUNT, 'Building project\n'));
+  const packageJSON = JSON.parse(await fs.readFile('package.json', 'utf8'));
 
-execSync('npm run --silent build', { stdio: 'inherit' });
+  packageJSON.name = PACKAGE_NAME;
+  packageJSON.dependencies.megastack = '^' + megastackPackageJSON.version;
 
-echo(`
-${decorateTitle(stepIndex++, TOTAL_STEP_COUNT, 'Project is ready')}
+  await fs.writeFile('package.json', JSON.stringify(packageJSON, null, 2));
 
-Go to ${decorateLink('https://megastack.dev')} for API docs and tutorials.
+  echo(decorateStep(stepIndex++, stepCount, 'Installing dependencies'));
+
+  execSync(PACKAGE_MANAGER + ' install --no-fund', { stdio: IS_SILENT ? 'ignore' : 'inherit' });
+
+  echo('\n' + decorateStep(stepIndex++, stepCount, 'Building project\n'));
+
+  execSync(PACKAGE_MANAGER + ' run --silent build', { stdio: IS_SILENT ? 'ignore' : 'inherit' });
+
+  echo(`
+${decorateStep(stepIndex++, stepCount, 'Project is ready')}
+
+See ${decorateLink('https://megastack.dev')} for API docs and tutorials.
 
 Install Devtools ${decorateLink('https://megastack.dev/react-executor#devtools')} extension for Chrome.
 
-Run ${decorateCmd('npm run dev')} to start the dev server with hot reload.
+Run ${decorateCmd(PACKAGE_MANAGER + ' run dev')} to start the dev server with hot reload.
 
-Run ${decorateCmd('npm run build')} to build the project.
+Run ${decorateCmd(PACKAGE_MANAGER + ' run build')} to build the project.
 
-Run ${decorateCmd('npm run preview')} to start the static site server.
+Run ${decorateCmd(PACKAGE_MANAGER + ' run preview')} to start the static site server.
 
-Run ${decorateCmd('npm run preview-ssr')} to start the SSR server.
+Run ${decorateCmd(PACKAGE_MANAGER + ' run preview-ssr')} to start the SSR server.
 `);
 
+  return 0;
+}
+
+function runHelpCommand(): number {
+  console.log(`${LOGO}
+Initialize a new MegaStack project.
+
+
+${decorateHeader('USAGE')}
+
+${decorateCmd('megastack init')} [...options]
+
+
+${decorateHeader('OPTIONS')}
+
+${decorateCmd('--packageManager')}  Package manager for installing dependencies.
+                  Default: npm
+
+   ${decorateCmd('--packageName')}  Project package name.
+
+     ${decorateCmd('--outputDir')}  Directory to output the project.
+
+         ${decorateCmd('--force')}  Overwrite existing files.
+
+        ${decorateCmd('--silent')}  Mute all output.
+
+          ${decorateCmd('--help')}  Print this message.
+
+
+See ${decorateLink('https://megastack.dev')} for API docs and tutorials.`);
+
+  return 0;
+}
+
 function echo(message: string): void {
-  console.log(message);
+  if (!IS_SILENT) {
+    console.log(message);
+  }
 }
 
 function decorateLink(url: string): string {
@@ -91,10 +157,14 @@ function decorateError(message: string): string {
   return chalk.bgRed.white(' ERROR ') + ' ' + message;
 }
 
-function decorateTitle(index: number, totalCount: number, message: string): string {
-  return chalk.magenta.inverse(` ${index}/${totalCount} `) + ' ' + chalk.bold.magenta(message);
+function decorateStep(stepIndex: number, stepCount: number, message: string): string {
+  return chalk.dim.inverse(` ${stepIndex}/${stepCount} `) + ' ' + chalk.bold(message);
+}
+
+function decorateHeader(message: string): string {
+  return chalk.bold(message);
 }
 
 function decorateCmd(cmd: string): string {
-  return chalk.bold(cmd);
+  return chalk.dim(cmd);
 }

@@ -1,0 +1,17 @@
+.Topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.Topic {
+  background-color: #d4d4d4;
+  border-radius: 0.5rem;
+  padding: 0 0.5rem;
+}
+
+.Stargazers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}

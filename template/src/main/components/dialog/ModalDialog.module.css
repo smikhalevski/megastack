@@ -1,0 +1,12 @@
+.ModalDialog {
+  width: 100%;
+  max-width: 30rem;
+  padding: 2rem;
+  border-radius: 1rem;
+}
+
+.Buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}

@@ -1,0 +1,19 @@
+.User {
+  --avatar-size: 2rem;
+
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.Avatar {
+  flex: 0 0 auto;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: var(--avatar-size);
+}
+
+.Login {
+  flex: 1 1 auto;
+  min-width: 0;
+}

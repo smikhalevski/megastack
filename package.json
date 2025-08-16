@@ -60,7 +60,9 @@
     "react-executor": "0.0.25-next.b8e5b7a"
   },
   "dependencies": {
+    "argcat": "^1.0.2",
     "chalk": "^5.5.0",
+    "doubter": "^5.1.1",
     "mime": "^4.0.7"
   }
 }
