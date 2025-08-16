@@ -5,11 +5,13 @@ import { Root } from './app/Root.js';
 import NotFoundPage from './app/NotFoundPage.js';
 import LoadingPage from './app/LoadingPage.js';
 import ErrorPage from './app/ErrorPage.js';
+import JSONMarshal from 'json-marshal';
 
 const server = createMegaStackServer({
   routes,
   manifest: parseViteManifest(JSON.parse(fs.readFileSync('manifest.json', 'utf-8'))),
   staticDir: 'public',
+  serializer: JSONMarshal,
   rootComponent: Root,
   loadingComponent: LoadingPage,
   notFoundComponent: NotFoundPage,

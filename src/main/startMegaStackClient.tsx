@@ -1,7 +1,7 @@
 import React, { ComponentType } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import { createBrowserHistory, History, HistoryOptions, HistoryProvider } from 'react-corsair/history';
-import { hydrateRouter, Outlet, Router, RouterOptions, RouterProvider } from 'react-corsair';
+import { hydrateRouter, Outlet, Router, RouterOptions, RouterProvider, Serializer } from 'react-corsair';
 import { ManifestProvider } from './useManifest.js';
 import { ExecutorManager, ExecutorManagerProvider, hydrateExecutorManager } from 'react-executor';
 
@@ -12,11 +12,12 @@ export interface MegaStackClient {
 
 export interface MegaStackClientOptions<Context> extends RouterOptions<Context>, HistoryOptions {
   isHydrated?: boolean;
+  serializer?: Serializer;
   rootComponent?: ComponentType;
 }
 
 export function startMegaStackClient<Context>(options: MegaStackClientOptions<Context>): MegaStackClient {
-  const { isHydrated, rootComponent: Root = Outlet } = options;
+  const { isHydrated, rootComponent: Root = Outlet, serializer } = options;
 
   const executorManager = new ExecutorManager();
 
@@ -45,8 +46,8 @@ export function startMegaStackClient<Context>(options: MegaStackClientOptions<Co
   );
 
   if (isHydrated) {
-    hydrateRouter(router, history.location);
-    hydrateExecutorManager(executorManager);
+    hydrateRouter(router, history.location, { serializer });
+    hydrateExecutorManager(executorManager, { serializer });
     hydrateRoot(document, rootElement);
   } else {
     router.navigate(history.location);

@@ -23,6 +23,7 @@
     "vite": "^7.0.6"
   },
   "dependencies": {
+    "json-marshal": "^0.0.4",
     "react": "^19.1.1",
     "react-corsair": "0.0.10-next.d2f9c35",
     "react-dom": "^19.1.1",
