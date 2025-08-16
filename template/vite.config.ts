@@ -8,7 +8,8 @@ export default defineConfig(env => {
     root: './src/main',
     publicDir: env.isSsrBuild ? false : 'public',
     build: {
-      minify: env.isSsrBuild ? false : 'esbuild',
+      minify: false,
+      // minify: env.isSsrBuild ? false : 'esbuild',
       cssMinify: 'lightningcss',
       sourcemap: env.isSsrBuild ? 'hidden' : false,
       assetsDir: '.',
@@ -17,7 +18,7 @@ export default defineConfig(env => {
       emptyOutDir: false,
       manifest: env.isSsrBuild ? undefined : 'manifest.json',
       rollupOptions: {
-        input: env.isSsrBuild ? './src/main/server.ts' : './src/main/index.html',
+        input: env.isSsrBuild ? './src/main/server.tsx' : './src/main/index.html',
         output: {
           entryFileNames: env.isSsrBuild ? 'server.js' : '[name]-[hash].js',
           chunkFileNames: env.isSsrBuild ? '[name].js' : '[name]-[hash].js',

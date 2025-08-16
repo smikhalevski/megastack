@@ -1,22 +1,36 @@
-import type * as Vite from 'vite';
-import { Manifest, ManifestChunk } from '../useManifest.js';
+import { Manifest } from 'vite';
 
-export function parseViteManifest(manifest: Vite.Manifest): Manifest {
-  const chunks = Object.values(manifest);
+export function parseViteManifest(
+  basePathname: string,
+  manifest: Manifest
+): {
+  bootstrapModules: string[];
+  prefetchModules: string[];
+  bootstrapCSS: string[];
+} {
+  const bootstrapModules = [];
+  const prefetchModules = [];
+  const bootstrapCSS = [];
 
-  return {
-    bootstrapChunks: chunks.reduce<ManifestChunk[]>((bootstrapChunks, chunk) => {
-      if (!chunk.isEntry) {
-        return bootstrapChunks;
+  for (const chunk of Object.values(manifest)) {
+    if (!chunk.isEntry) {
+      continue;
+    }
+
+    bootstrapModules.push(basePathname + chunk.file);
+
+    if (chunk.imports !== undefined) {
+      for (const url of chunk.imports) {
+        prefetchModules.push(basePathname + url.replace(/^_/, ''));
       }
+    }
 
-      bootstrapChunks.push({ type: 'js', url: '/' + chunk.file });
+    if (chunk.css !== undefined) {
+      for (const url of chunk.css) {
+        bootstrapCSS.push(basePathname + url.replace(/^_/, ''));
+      }
+    }
+  }
 
-      chunk.css?.forEach(url => bootstrapChunks.push({ type: 'css', url: '/' + url }));
-
-      return bootstrapChunks;
-    }, []),
-
-    preloadedChunks: [],
-  };
+  return { bootstrapModules, prefetchModules, bootstrapCSS };
 }

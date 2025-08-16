@@ -1,8 +1,8 @@
-export interface ReactChunkInjector extends ReadableWritablePair {
-  inject(chunk: string): void;
+export interface ChunkInjector extends ReadableWritablePair {
+  pushChunk(chunk: string): void;
 }
 
-export function createReactChunkInjector(nextChunk?: () => string): ReactChunkInjector {
+export function createChunkInjector(pullChunk?: () => string): ChunkInjector {
   const textEncoder = new TextEncoder();
 
   let canInject = false;
@@ -15,7 +15,7 @@ export function createReactChunkInjector(nextChunk?: () => string): ReactChunkIn
       return;
     }
 
-    const chunk = chunkBuffer.join('') + (nextChunk !== undefined ? nextChunk() : '');
+    const chunk = chunkBuffer.join('') + (pullChunk !== undefined ? pullChunk() : '');
 
     if (chunk !== '') {
       chunkBuffer = [];
@@ -49,7 +49,7 @@ export function createReactChunkInjector(nextChunk?: () => string): ReactChunkIn
     readable,
     writable,
 
-    inject(chunk) {
+    pushChunk(chunk) {
       if (chunk !== '') {
         chunkBuffer.push(chunk);
         inject();
