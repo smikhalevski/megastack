@@ -2,7 +2,7 @@ import React, { ComponentType } from 'react';
 import { createServer, Server } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { renderToReadableStream } from 'react-dom/server.browser';
-import { Outlet, RouterOptions, RouterProvider, Serializer } from 'react-corsair';
+import { Outlet, Redirect, RouterOptions, RouterProvider, Serializer } from 'react-corsair';
 import { createMemoryHistory, HistoryOptions, HistoryProvider } from 'react-corsair/history';
 import { Manifest, ManifestProvider } from '../useManifest.js';
 import * as fs from 'node:fs';
@@ -27,7 +27,7 @@ export function createMegaStackServer<Context>(options: MegaStackServerOptions<C
 
   const bootstrapModules = manifest.bootstrapChunks.filter(chunk => chunk.type === 'js').map(chunk => chunk.url);
 
-  return createServer(async (request, response) => {
+  return createServer((request, response) => {
     const { url = basePathname } = request;
 
     if (url === '/.well-known/appspecific/com.chrome.devtools.json') {
@@ -58,6 +58,19 @@ export function createMegaStackServer<Context>(options: MegaStackServerOptions<C
 
     const router = new SSRRouter({ ...options, nonce, serializer });
 
+    const handleRedirect = (redirect: Redirect) => {
+      const url = history.toAbsoluteURL(redirect.to);
+
+      if (response.headersSent) {
+        scriptInjector(`window.location.replace(${JSON.stringify(url)});`);
+        return;
+      }
+      response.statusCode = 302;
+      response.setHeader('Location', url);
+      response.end();
+      abortController.abort(redirect);
+    };
+
     router.subscribe(event => {
       switch (event.type) {
         case 'not_found':
@@ -68,15 +81,7 @@ export function createMegaStackServer<Context>(options: MegaStackServerOptions<C
           break;
 
         case 'redirect':
-          const url = history.toAbsoluteURL(event.to);
-
-          if (response.headersSent) {
-            scriptInjector(`window.location.replace(${JSON.stringify(url)});`);
-            break;
-          }
-          response.statusCode = 302;
-          response.setHeader('Location', url);
-          response.end();
+          handleRedirect(new Redirect(event.to));
           break;
       }
     });
@@ -98,7 +103,11 @@ export function createMegaStackServer<Context>(options: MegaStackServerOptions<C
       },
     });
 
-    const stream = await renderToReadableStream(
+    if (abortController.signal.aborted) {
+      return;
+    }
+
+    renderToReadableStream(
       <HistoryProvider value={history}>
         <RouterProvider value={router}>
           <ExecutorManagerProvider value={executorManager}>
@@ -114,11 +123,14 @@ export function createMegaStackServer<Context>(options: MegaStackServerOptions<C
         nonce,
         bootstrapModules,
         signal: abortController.signal,
+        onError(error) {
+          if (error instanceof Redirect) {
+            handleRedirect(error);
+          }
+        },
       }
-    );
-
-    await stream.pipeThrough(headersInjector).pipeThrough(chunkInjector).pipeTo(Writable.toWeb(response));
-
-    response.end();
+    )
+      .then(stream => stream.pipeThrough(headersInjector).pipeThrough(chunkInjector).pipeTo(Writable.toWeb(response)))
+      .catch(error => console.log(error));
   });
 }
