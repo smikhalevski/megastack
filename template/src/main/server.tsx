@@ -53,6 +53,9 @@ app.get('/*', c => {
     history,
     router,
     executorManager,
+    headers: {
+      'Content-Security-Policy': `default-src 'self' *.github.com *.githubusercontent.com; script-src 'self' 'nonce-${nonce}'`,
+    },
     nonce,
     bootstrapModules,
     bootstrapCSS,
@@ -64,3 +67,5 @@ app.get('/*', c => {
 });
 
 serve(app);
+
+console.log('Started on http://localhost:3000');

@@ -8,8 +8,7 @@ export default defineConfig(env => {
     root: './src/main',
     publicDir: env.isSsrBuild ? false : 'public',
     build: {
-      minify: false,
-      // minify: env.isSsrBuild ? false : 'esbuild',
+      minify: env.isSsrBuild ? false : 'esbuild',
       cssMinify: 'lightningcss',
       sourcemap: env.isSsrBuild ? 'hidden' : false,
       assetsDir: '.',
@@ -63,8 +62,8 @@ export default defineConfig(env => {
         },
       },
     ],
-    define: {
-      'process.env.NODE_ENV': '"development"',
-    },
+    // define: {
+    //   'process.env.NODE_ENV': '"development"',
+    // },
   };
 });
