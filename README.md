@@ -8,6 +8,13 @@
 
 <br/>
 
+MegaStack is a web frontend bootstrapper that provides tools for routing, data fetching, task execution, form state
+management and validation out-of-the-box.
+
+Applications built with MegaStack support both streaming SSR and standalone CSR simultaneously and can be deployed in
+any environment. Every part of MegaStack is designed to be as performant and memory-optimized as possible, while
+offering concise, expressive APIs and an excellent developer experience.
+
 ```bash
 npx megastack init
 ```

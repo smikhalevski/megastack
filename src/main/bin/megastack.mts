@@ -15,7 +15,7 @@ const argsShape = d.object({
 
   packageName: d.string().coerce().optional(),
 
-  outputDir: d.string().coerce().optional(process.cwd()),
+  outDir: d.string().coerce().optional(process.cwd()),
 
   force: d.boolean().optional(false),
 
@@ -29,9 +29,9 @@ const argsShape = d.object({
 const args = argsShape.parse(parseArgs(process.argv.slice(2), { flags: ['force', 'silent', 'help'] }));
 
 const TEMPLATE_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '../template');
-const OUTPUT_DIR = path.resolve(args.outputDir);
+const OUT_DIR = path.resolve(args.outDir);
 const PACKAGE_MANAGER = args.packageManager;
-const PACKAGE_NAME = args.packageName || path.basename(OUTPUT_DIR);
+const PACKAGE_NAME = args.packageName || path.basename(OUT_DIR);
 const IS_SILENT = args.silent;
 const IS_HELP = args.help;
 const IS_FORCE = args.force;
@@ -61,9 +61,9 @@ async function runCommand(command: string): Promise<number> {
 async function runInitCommand(): Promise<number> {
   echo(LOGO);
 
-  await fs.mkdir(OUTPUT_DIR, { recursive: true });
+  await fs.mkdir(OUT_DIR, { recursive: true });
 
-  if (!IS_FORCE && (await fs.readdir(OUTPUT_DIR)).length !== 0) {
+  if (!IS_FORCE && (await fs.readdir(OUT_DIR)).length !== 0) {
     echo(decorateError('The output directory must be empty.'));
     return 1;
   }
@@ -74,9 +74,9 @@ async function runInitCommand(): Promise<number> {
 
   echo(decorateStep(stepIndex++, stepCount, 'Copying project files\n'));
 
-  await fs.cp(TEMPLATE_DIR, OUTPUT_DIR, { recursive: true, force: IS_FORCE });
+  await fs.cp(TEMPLATE_DIR, OUT_DIR, { recursive: true, force: IS_FORCE });
 
-  process.chdir(OUTPUT_DIR);
+  process.chdir(OUT_DIR);
 
   const packageJSON = JSON.parse(await fs.readFile('package.json', 'utf8'));
 
@@ -129,7 +129,7 @@ ${decorateCmd('--packageManager')}  Package manager for installing dependencies.
 
    ${decorateCmd('--packageName')}  Project package name.
 
-     ${decorateCmd('--outputDir')}  Directory to output the project.
+        ${decorateCmd('--outDir')}  Directory to output the project.
 
          ${decorateCmd('--force')}  Overwrite existing files.
 
