@@ -49,14 +49,15 @@ export async function renderToResponse(options: RenderToResponseOptions): Promis
   });
 
   const pushRedirect = (to: To | string) => {
-    const url = history.toAbsoluteURL(to);
+    const url = typeof to === 'string' ? to : history.toURL(to);
 
-    if (response !== undefined) {
-      pushScript(`window.location.replace(${JSON.stringify(url)});`);
-      stream.cancel();
-    } else {
+    if (response === undefined) {
       response = Response.redirect(url);
+      return;
     }
+
+    pushScript(`window.location.replace(${JSON.stringify(url)});`);
+    stream.cancel();
   };
 
   router.subscribe(event => {

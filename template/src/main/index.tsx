@@ -1,24 +1,27 @@
 import './index.css';
-import { startClient } from 'megastack';
-import { routes } from './app/routes.js';
+import { renderClient } from 'megastack';
 import { App } from './app/App.js';
 import NotFoundPage from './app/NotFoundPage.js';
 import LoadingPage from './app/LoadingPage.js';
 import ErrorPage from './app/ErrorPage.js';
-import JSONMarshal from 'json-marshal';
 import React from 'react';
 import { createBrowserHistory, jsonSearchParamsSerializer } from 'react-corsair/history';
 import { ExecutorManager } from 'react-executor';
 import { Router } from 'react-corsair';
+import { navigableRoutes, ssrStateSerializer, stableKeyIdGenerator } from './shared.js';
 
-const executorManager = new ExecutorManager();
+const executorManager = new ExecutorManager({
+  keyIdGenerator: stableKeyIdGenerator,
+});
 
 const history = createBrowserHistory({
   searchParamsSerializer: jsonSearchParamsSerializer,
 });
 
+history.start();
+
 const router = new Router({
-  routes,
+  routes: navigableRoutes,
   context: {
     executorManager,
   },
@@ -27,11 +30,17 @@ const router = new Router({
   errorComponent: ErrorPage,
 });
 
-startClient({
+router.subscribe(event => {
+  if (event.type === 'navigate' && !event.isIntercepted && event.prevLocation.pathname !== event.location.pathname) {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }
+});
+
+renderClient({
   executorManager,
   history,
   router,
   isHydrated: document.documentElement.getAttribute('data-static') === null,
-  serializer: JSONMarshal,
+  serializer: ssrStateSerializer,
   children: <App />,
 });

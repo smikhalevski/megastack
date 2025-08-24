@@ -1,13 +1,13 @@
 import React, { ReactNode } from 'react';
 import { useRoute } from 'react-corsair';
-import { repositoryRoute } from '../routes.js';
+import * as routes from '../routes.js';
 import { useRepository } from '../executors.js';
 import { useNumberFormat } from 'react-hookers';
 import { User } from '../../components/avatar/User.js';
 
 export default function RepositoryInfoPage(): ReactNode {
   const numberFormat = useNumberFormat();
-  const routeController = useRoute(repositoryRoute);
+  const routeController = useRoute(routes.repositoryRoute);
   const repository = useRepository(routeController.params.slug);
 
   return (

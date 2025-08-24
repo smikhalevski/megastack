@@ -1,4 +1,11 @@
-import { useExecutor, useExecutorSuspense } from 'react-executor';
+import {
+  Executor,
+  ExecutorManager,
+  useExecutor,
+  useExecutorManager,
+  useExecutorSubscription,
+  useExecutorSuspense,
+} from 'react-executor';
 import { notFound } from 'react-corsair';
 
 export namespace GitHub {
@@ -33,24 +40,32 @@ export function useRepositories(): GitHub.Repository[] {
   return useExecutorSuspense(repositoriesExecutor).get();
 }
 
-export function useRepository(slug: string): GitHub.Repository {
-  slug = slug.replace(/\/$/, '');
-
-  const repositoryExecutor = useExecutor(['repository', slug], signal =>
+export function getRepositoryExecutor(executorManager: ExecutorManager, slug: string): Executor<GitHub.Repository> {
+  return executorManager.getOrCreate(['repository', slug], signal =>
     fetchJSON(`https://api.github.com/repos/${slug}`, { signal })
   );
+}
 
-  return useExecutorSuspense(repositoryExecutor).get();
+export function useRepository(slug: string): GitHub.Repository {
+  const repositoryExecutor = getRepositoryExecutor(useExecutorManager(), slug);
+
+  // Re-render component when executor state changes, activates an executor on mount
+  useExecutorSubscription(repositoryExecutor);
+
+  // Suspend rendering until executor is settled
+  useExecutorSuspense(repositoryExecutor);
+
+  return repositoryExecutor.get();
 }
 
 export function useStargazers(slug: string): GitHub.User[] {
-  slug = slug.replace(/\/$/, '');
-
   const stargazersExecutor = useExecutor(['repository_stargazers', slug], signal =>
     fetchJSON(`https://api.github.com/repos/${slug}/stargazers`, { signal })
   );
 
-  return useExecutorSuspense(stargazersExecutor).get();
+  useExecutorSuspense(stargazersExecutor);
+
+  return stargazersExecutor.get();
 }
 
 async function fetchJSON(url: string, options?: RequestInit): Promise<any> {

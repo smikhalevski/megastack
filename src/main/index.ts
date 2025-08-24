@@ -1,1 +1,1 @@
-export { startClient, type StartClientOptions } from './startClient.js';
+export { renderClient, type RenderClientOptions } from './renderClient.js';

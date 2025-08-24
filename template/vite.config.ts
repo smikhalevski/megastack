@@ -65,5 +65,8 @@ export default defineConfig(env => {
     // define: {
     //   'process.env.NODE_ENV': '"development"',
     // },
+    resolve: {
+      preserveSymlinks: true,
+    },
   };
 });

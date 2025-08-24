@@ -1,6 +1,5 @@
 import * as fs from 'node:fs';
 import React from 'react';
-import JSONMarshal from 'json-marshal';
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
@@ -8,11 +7,11 @@ import { isBot, parseViteManifest, renderToResponse } from 'megastack/ssr';
 import { createMemoryHistory, jsonSearchParamsSerializer } from 'react-corsair/history';
 import { SSRRouter } from 'react-corsair/ssr';
 import { SSRExecutorManager } from 'react-executor/ssr';
-import { routes } from './app/routes.js';
 import { App } from './app/App.js';
 import LoadingPage from './app/LoadingPage.js';
 import NotFoundPage from './app/NotFoundPage.js';
 import ErrorPage from './app/ErrorPage.js';
+import { stableKeyIdGenerator, navigableRoutes, ssrStateSerializer } from './shared.js';
 
 const { bootstrapModules, prefetchModules, bootstrapCSS } = parseViteManifest(
   '/',
@@ -30,20 +29,24 @@ app.get('/*', c => {
 
   const executorManager = new SSRExecutorManager({
     nonce,
-    serializer: JSONMarshal,
+    serializer: ssrStateSerializer,
+    keyIdGenerator: stableKeyIdGenerator,
   });
 
-  const history = createMemoryHistory([c.req.url.substring(new URL(c.req.url).origin.length)], {
+  const url = new URL(c.req.url);
+
+  const history = createMemoryHistory({
+    initialEntries: [url.pathname + url.search + url.hash],
     searchParamsSerializer: jsonSearchParamsSerializer,
   });
 
   const router = new SSRRouter({
     nonce,
-    routes,
+    routes: navigableRoutes,
     context: {
       executorManager,
     },
-    serializer: JSONMarshal,
+    serializer: ssrStateSerializer,
     loadingComponent: LoadingPage,
     notFoundComponent: NotFoundPage,
     errorComponent: ErrorPage,

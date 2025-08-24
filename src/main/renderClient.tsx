@@ -4,7 +4,7 @@ import { History, HistoryProvider } from 'react-corsair/history';
 import { hydrateRouter, Router, RouterProvider, Serializer } from 'react-corsair';
 import { ExecutorManager, ExecutorManagerProvider, hydrateExecutorManager } from 'react-executor';
 
-export interface StartClientOptions {
+export interface RenderClientOptions {
   history: History;
   router: Router;
   executorManager: ExecutorManager;
@@ -13,7 +13,7 @@ export interface StartClientOptions {
   children?: ReactNode;
 }
 
-export function startClient(options: StartClientOptions): void {
+export function renderClient(options: RenderClientOptions): void {
   const { history, router, executorManager, isHydrated, serializer, children } = options;
 
   history.subscribe(() => router.navigate(history.location));

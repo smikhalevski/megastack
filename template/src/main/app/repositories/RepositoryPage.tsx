@@ -1,19 +1,19 @@
 import React, { ReactNode, Suspense } from 'react';
 import { Outlet, useRoute } from 'react-corsair';
-import { repositoriesRoute, repositoryRoute } from '../routes.js';
+import * as routes from '../routes.js';
 import { Link } from 'react-corsair/history';
 import { useRepository, useStargazers } from '../executors.js';
 import { User } from '../../components/avatar/User.js';
 import css from './RepositoryPage.module.css';
 
 export default function RepositoryPage(): ReactNode {
-  const routeController = useRoute(repositoryRoute);
+  const routeController = useRoute(routes.repositoryRoute);
   const repository = useRepository(routeController.params.slug);
 
   return (
     <>
       <p>
-        <Link to={repositoriesRoute}>{'← Go to repositories'}</Link>
+        <Link to={routes.repositoriesRoute}>{'← Go to repositories'}</Link>
       </p>
 
       <Outlet />
@@ -41,7 +41,7 @@ export default function RepositoryPage(): ReactNode {
 }
 
 function Stargazers(): ReactNode {
-  const routeController = useRoute(repositoryRoute);
+  const routeController = useRoute(routes.repositoryRoute);
   const stargazers = useStargazers(routeController.params.slug);
 
   return (

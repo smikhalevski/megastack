@@ -24,7 +24,7 @@
     "test:definitions": "tsd --typings lib/index.d.ts --files src/main/ssr/global.d.ts --files 'src/test/**/*.test-d.ts'",
     "perf": "toofast",
     "docs": "typedoc",
-    "postinstall": "ln -nsf ../lib node_modules/megastack"
+    "postinstall": "cd template && npm ci && ln -nsf ../../lib node_modules/megastack"
   },
   "repository": {
     "type": "git",
@@ -41,27 +41,27 @@
   },
   "homepage": "https://github.com/smikhalevski/megastack#readme",
   "devDependencies": {
-    "@types/node": "^24.2.1",
-    "@types/react": "^19.1.9",
-    "@types/react-dom": "^19.1.7",
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
     "tsd": "^0.33.0",
     "tslib": "^2.8.1",
-    "typedoc": "^0.28.10",
-    "typedoc-plugin-mdn-links": "^5.0.8",
+    "typedoc": "^0.28.11",
+    "typedoc-plugin-mdn-links": "^5.0.9",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   },
   "peerDependencies": {
     "react": ">=19.0.0",
-    "react-corsair": "0.0.10-next.d2f9c35",
+    "react-corsair": "^0.0.11",
     "react-dom": ">=19.0.0",
-    "react-executor": "0.0.25-next.b8e5b7a"
+    "react-executor": "^0.0.26"
   },
   "dependencies": {
     "argcat": "^1.0.2",
-    "chalk": "^5.5.0",
-    "doubter": "5.1.1-next.6b561d3"
+    "chalk": "^5.6.0",
+    "doubter": "^5.2.0"
   }
 }
