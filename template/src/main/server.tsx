@@ -1,6 +1,5 @@
 import * as fs from 'node:fs';
 import React from 'react';
-import JSONMarshal from 'json-marshal';
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
@@ -13,6 +12,7 @@ import { App } from './app/App.js';
 import LoadingPage from './app/LoadingPage.js';
 import NotFoundPage from './app/NotFoundPage.js';
 import ErrorPage from './app/ErrorPage.js';
+import { executorKeyIdGenerator, ssrStateSerializer } from './shared.js';
 
 const { bootstrapModules, prefetchModules, bootstrapCSS } = parseViteManifest(
   '/',
@@ -30,7 +30,8 @@ app.get('/*', c => {
 
   const executorManager = new SSRExecutorManager({
     nonce,
-    serializer: JSONMarshal,
+    serializer: ssrStateSerializer,
+    keyIdGenerator: executorKeyIdGenerator,
   });
 
   const history = createMemoryHistory([c.req.url.substring(new URL(c.req.url).origin.length)], {
@@ -43,7 +44,7 @@ app.get('/*', c => {
     context: {
       executorManager,
     },
-    serializer: JSONMarshal,
+    serializer: ssrStateSerializer,
     loadingComponent: LoadingPage,
     notFoundComponent: NotFoundPage,
     errorComponent: ErrorPage,
