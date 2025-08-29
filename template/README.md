@@ -24,3 +24,7 @@ Run `npm run build` to build the project.
 Run `npm run preview` to start the static site server.
 
 Run `npm run preview-ssr` to start the SSR server.
+
+Run `npm run typecheck` to run TypeScript type check.
+
+Run `npm run container` to build and run Docker container.

@@ -6,10 +6,11 @@
   "scripts": {
     "clean": "rimraf build",
     "build": "vite build && vite build --ssr",
-    "preview": "vite preview",
-    "preview-ssr": "cd build && node server.js",
+    "preview": "[ -d build ]|| npm run build && vite preview",
+    "preview-ssr": "[ -d build ]|| npm run build && cd build && node server.js",
     "typecheck": "tsc",
-    "dev": "vite"
+    "dev": "vite",
+    "container": "[ -d build ]|| npm run build && docker rm --force $npm_package_name && docker rmi --force $npm_package_name && docker run --name $npm_package_name --interactive --tty --publish 3000:3000 $(docker build --tag $npm_package_name --quiet .)"
   },
   "engines": {
     "node": ">=18.0.0"

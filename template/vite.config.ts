@@ -35,6 +35,9 @@ export default defineConfig(env => {
         plugins: [postcssNested(), autoprefixer()],
       },
     },
+    esbuild: {
+      legalComments: 'none',
+    },
     plugins: [
       {
         name: 'rename-manifest',
