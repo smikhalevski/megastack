@@ -1,5 +1,7 @@
 import React, { ReactNode, useLayoutEffect, useRef } from 'react';
 import css from './ModalDialog.module.css';
+import * as Messages from '@mfml/messages';
+import { Message } from 'mfml/react';
 
 interface ModalDialogProps {
   onClose: () => void;
@@ -23,7 +25,9 @@ export function ModalDialog(props: ModalDialogProps): ReactNode {
       <div className={css.Buttons}>
         {props.buttons}
 
-        <button onClick={() => dialogRef.current!.close()}>{'Close'}</button>
+        <button onClick={() => dialogRef.current!.close()}>
+          <Message message={Messages.closeDialog} />
+        </button>
       </div>
     </dialog>
   );

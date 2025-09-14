@@ -1,0 +1,13 @@
+{
+  "repositoriesHeading": "Repositories ({count,number})",
+  "repositoryInfoLoading": "Loading repository info…",
+  "showFullPage": "Show full page",
+  "closeDialog": "Close",
+  "goToRepositories": "← Go to repositories",
+  "topicsHeading": "Topics",
+  "stargazersHeading": "Stargazers",
+  "stargazersLoading": "Loading stargazers…",
+  "errorHeading": "An error occurred",
+  "loadingHeading": "Loading…",
+  "notFoundHeading": "Not found"
+}

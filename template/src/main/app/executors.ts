@@ -8,6 +8,18 @@ import {
 } from 'react-executor';
 import { notFound } from 'react-corsair';
 
+export function useLocale(): [locale: string, setLocale: (locale: string) => void] {
+  const localeExecutor = getLocaleExecutor(useExecutorManager());
+
+  useExecutorSubscription(localeExecutor);
+
+  return [localeExecutor.get(), localeExecutor.resolve];
+}
+
+export function getLocaleExecutor(executorManager: ExecutorManager): Executor<string> {
+  return executorManager.getOrCreate(['locale'], 'en-US');
+}
+
 export namespace GitHub {
   export interface Repository {
     id: number;

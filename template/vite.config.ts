@@ -23,6 +23,9 @@ export default defineConfig(env => {
           chunkFileNames: env.isSsrBuild ? '[name].js' : '[name]-[hash].js',
           assetFileNames: '[name]-[hash].[ext]',
           manualChunks(id) {
+            if (id.includes('@mfml/messages')) {
+              return;
+            }
             if (id.includes('node_modules')) {
               return 'vendor';
             }

@@ -11,7 +11,7 @@ import { App } from './app/App.js';
 import LoadingPage from './app/LoadingPage.js';
 import NotFoundPage from './app/NotFoundPage.js';
 import ErrorPage from './app/ErrorPage.js';
-import { stableKeyIdGenerator, navigableRoutes, ssrStateSerializer } from './shared.js';
+import { navigableRoutes, ssrStateSerializer, stableKeyIdGenerator } from './shared.js';
 
 const { bootstrapModules, prefetchModules, bootstrapCSS } = parseViteManifest(
   '/',

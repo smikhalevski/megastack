@@ -1,0 +1,13 @@
+{
+  "repositoriesHeading": "Репозитории ({count,number})",
+  "repositoryInfoLoading": "Загрузка информации о репозитории…",
+  "showFullPage": "Показать полную страницу",
+  "closeDialog": "Закрыть",
+  "goToRepositories": "← Вернуться к репозиториям",
+  "topicsHeading": "Темы",
+  "stargazersHeading": "Звездочеты",
+  "stargazersLoading": "Загрузка звездочетов…",
+  "errorHeading": "Возникла ошибка",
+  "loadingHeading": "Загрузка…",
+  "notFoundHeading": "Не найдено"
+}

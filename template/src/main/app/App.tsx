@@ -1,7 +1,11 @@
 import React, { ReactNode, StrictMode } from 'react';
 import { Outlet } from 'react-corsair';
+import { MessageLocaleProvider } from 'mfml/react';
+import { useLocale } from './executors.js';
 
 export function App(): ReactNode {
+  const [locale, setLocale] = useLocale();
+
   return (
     <html>
       <head>
@@ -29,8 +33,18 @@ export function App(): ReactNode {
         />
       </head>
       <body>
+        <select
+          value={locale}
+          onChange={event => setLocale(event.target.value)}
+        >
+          <option value={'en-US'}>{'English'}</option>
+          <option value={'ru-RU'}>{'Русский'}</option>
+        </select>
+
         <StrictMode>
-          <Outlet />
+          <MessageLocaleProvider value={locale}>
+            <Outlet />
+          </MessageLocaleProvider>
         </StrictMode>
       </body>
     </html>
