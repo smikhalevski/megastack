@@ -2,13 +2,13 @@
   <a href="#readme"><picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/smikhalevski/megastack/refs/heads/master/assets/logo-dark.png" />
     <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/smikhalevski/megastack/refs/heads/master/assets/logo-light.png" />
-    <img alt="MegaStack" src="https://raw.githubusercontent.com/smikhalevski/megastack/refs/heads/master/assets/logo-light.png" width="150" />
+    <img alt="Megastack" src="https://raw.githubusercontent.com/smikhalevski/megastack/refs/heads/master/assets/logo-light.png" width="150" />
   </picture></a>
 </p>
 
 <br/>
 
-The bootstrap MegaStack app uses:
+The bootstrap Megastack app uses:
 - [React Corsair](http://megastack.dev/react-corsair) for routing.
 - [React Executor](http://megastack.dev/react-executor) for state management.
 - [Doubter](http://megastack.dev/doubter) for data validation.

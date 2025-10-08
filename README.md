@@ -2,17 +2,17 @@
   <a href="#readme"><picture>
     <source media="(prefers-color-scheme: dark)" srcset="./assets/logo-dark.png" />
     <source media="(prefers-color-scheme: light)" srcset="./assets/logo-light.png" />
-    <img alt="MegaStack" src="./assets/logo-light.png" width="150" />
+    <img alt="Megastack" src="./assets/logo-light.png" width="150" />
   </picture></a>
 </p>
 
 <br/>
 
-MegaStack is a web frontend bootstrapper that provides tools for routing, data fetching, task execution, form state
+Megastack is a web frontend bootstrapper that provides tools for routing, data fetching, task execution, form state
 management and validation out-of-the-box.
 
-Applications built with MegaStack support both streaming SSR and standalone CSR simultaneously and can be deployed in
-any environment. Every part of MegaStack is designed to be as performant and memory-optimized as possible, while
+Applications built with Megastack support both streaming SSR and standalone CSR simultaneously and can be deployed in
+any environment. Every part of Megastack is designed to be as performant and memory-optimized as possible, while
 offering concise, expressive APIs and an excellent developer experience.
 
 ```bash

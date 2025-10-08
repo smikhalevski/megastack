@@ -114,7 +114,7 @@ Run ${decorateCmd(PACKAGE_MANAGER + ' run preview-ssr')} to start the SSR server
 
 function runHelpCommand(): number {
   console.log(`${LOGO}
-Initialize a new MegaStack project.
+Initialize a new Megastack project.
 
 
 ${decorateHeader('USAGE')}
