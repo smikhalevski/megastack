@@ -8,8 +8,8 @@
 
 <br/>
 
-Megastack is a web frontend bootstrapper that provides tools for routing, data fetching, task execution, form state
-management and validation out-of-the-box.
+Megastack is a web frontend bootstrapper that provides tools for routing, data fetching, task execution,
+form state management, validation, localization and internationalization out of the box.
 
 Applications built with Megastack support both streaming SSR and standalone CSR simultaneously and can be deployed in
 any environment. Every part of Megastack is designed to be as performant and memory-optimized as possible, while

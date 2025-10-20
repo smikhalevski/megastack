@@ -9,6 +9,12 @@ import { createBrowserHistory, jsonSearchParamsSerializer } from 'react-corsair/
 import { ExecutorManager } from 'react-executor';
 import { Router } from 'react-corsair';
 import { navigableRoutes, ssrStateSerializer, stableKeyIdGenerator } from './shared.js';
+import { enableDevtool } from 'mfml/react';
+import messagesMetadata from '@mfml/messages/metadata';
+
+if (import.meta.env.DEV) {
+  enableDevtool(messagesMetadata);
+}
 
 const executorManager = new ExecutorManager({
   keyIdGenerator: stableKeyIdGenerator,
