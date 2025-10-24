@@ -7,7 +7,7 @@ import { CookieOptions } from './types.js';
  * @param cookie The [`Cookie`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cookie) header value
  * or {@link document.cookie}.
  */
-export function parseCookies(cookie: string[] | string | null | undefined): Record<string, string> {
+export function parseCookies(cookie: readonly string[] | string | null | undefined): Record<string, string> {
   if (cookie === '' || cookie === null || cookie === undefined) {
     return {};
   }
@@ -40,12 +40,12 @@ export function parseCookies(cookie: string[] | string | null | undefined): Reco
 }
 
 /**
- * Returns the array of cookie names.
+ * Returns the array of unique cookie names.
  *
  * @param cookie The [`Cookie`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cookie) header value
  * or {@link document.cookie}.
  */
-export function getCookieNames(cookie: string[] | string | null | undefined): string[] {
+export function getCookieNames(cookie: readonly string[] | string | null | undefined): string[] {
   if (cookie === '' || cookie === null || cookie === undefined) {
     return [];
   }
@@ -69,7 +69,11 @@ export function getCookieNames(cookie: string[] | string | null | undefined): st
       continue;
     }
 
-    names.push(decodeURIComponent(cookie.substring(startIndex, valueIndex).trim()));
+    const name = decodeURIComponent(cookie.substring(startIndex, valueIndex).trim());
+
+    if (names.indexOf(name) === -1) {
+      names.push(name);
+    }
   }
 
   return names;
@@ -83,7 +87,10 @@ export function getCookieNames(cookie: string[] | string | null | undefined): st
  * @param name The name of a cookie to retrieve.
  * @returns A cookie value or `undefined` if there's no cookie with the given name.
  */
-export function getCookieValue(cookie: string[] | string | null | undefined, name: string): string | undefined {
+export function getCookieValue(
+  cookie: readonly string[] | string | null | undefined,
+  name: string
+): string | undefined {
   if (cookie === '' || cookie === null || cookie === undefined) {
     return;
   }
@@ -156,36 +163,42 @@ export function stringifyCookie(name: string, value: string, options?: CookieOpt
     return cookie;
   }
 
-  if (options.expiresAt !== undefined) {
-    const date = new Date(options.expiresAt);
+  const { expiresAt, maxAge, path, domain, sameSite, isSecure, isHttpOnly, isPartitioned } = options;
+
+  if (expiresAt !== undefined) {
+    const date = new Date(expiresAt);
 
     if (+date === +date) {
       cookie += '; Expires=' + date.toUTCString();
     }
   }
 
-  if (options.maxAge !== undefined) {
-    cookie += '; Max-Age=' + ((options.maxAge / 1_000) | 0);
+  if (maxAge !== undefined && +maxAge === +maxAge) {
+    cookie += '; Max-Age=' + (maxAge | 0);
   }
 
-  if (options.path !== undefined) {
-    cookie += '; Path=' + options.path;
+  if (path !== undefined) {
+    cookie += '; Path=' + path;
   }
 
-  if (options.domain !== undefined) {
-    cookie += '; Domain=' + options.domain;
+  if (domain !== undefined) {
+    cookie += '; Domain=' + domain;
   }
 
-  if (options.sameSite !== undefined) {
-    cookie += '; SameSite=' + options.sameSite;
+  if (sameSite !== undefined) {
+    cookie += '; SameSite=' + sameSite;
   }
 
-  if (options.isSecure !== undefined) {
+  if (isSecure) {
     cookie += '; Secure';
   }
 
-  if (options.isHttpOnly !== undefined) {
+  if (isHttpOnly) {
     cookie += '; HttpOnly';
+  }
+
+  if (isPartitioned) {
+    cookie += '; Partitioned';
   }
 
   return cookie;

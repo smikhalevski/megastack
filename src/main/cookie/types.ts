@@ -10,7 +10,7 @@ export interface CookieOptions {
   expiresAt?: Date | string | number;
 
   /**
-   * Indicates the number of milliseconds until the cookie expires. A zero or negative number will expire the cookie
+   * Indicates the number of _seconds_ until the cookie expires. A zero or negative number will expire the cookie
    * immediately.
    *
    * If both {@link expiresAt} and {@link maxAge} are set, {@link maxAge} has precedence.
@@ -52,6 +52,14 @@ export interface CookieOptions {
    * Forbids JavaScript from accessing the cookie, for example, through the `document.cookie` property.
    */
   isHttpOnly?: boolean;
+
+  /**
+   * Indicates that the cookie should be stored using partitioned storage. Note that if this is set to `true`,
+   * {@link isSecure} must also be set to `true`. See
+   * [Cookies Having Independent Partitioned State (CHIPS)](https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Privacy_sandbox/Partitioned_cookies)
+   * for more details.
+   */
+  isPartitioned?: boolean;
 }
 
 /**

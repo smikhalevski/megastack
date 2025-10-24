@@ -1,13 +1,14 @@
-import { AccessorCookieStorage } from './AccessorCookieStorage.js';
-import { CookieStorage } from './types.js';
+import { createCookieStorage } from './createCookieStorage.js';
 
 /**
  * Cookie storage that uses {@link document.cookie} to read and write cookies.
  */
-export const documentCookieStorage: CookieStorage = new AccessorCookieStorage(
-  () => document.cookie,
+export const documentCookieStorage = createCookieStorage({
+  getCookie() {
+    return document.cookie;
+  },
 
-  cookie => {
+  setCookie(cookie) {
     document.cookie = cookie;
-  }
-);
+  },
+});
