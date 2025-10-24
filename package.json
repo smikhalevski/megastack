@@ -58,5 +58,8 @@
     "react-corsair": "^0.0.11",
     "react-dom": ">=19.0.0",
     "react-executor": "^0.0.26"
+  },
+  "dependencies": {
+    "locale-matcher": "^2.2.1"
   }
 }

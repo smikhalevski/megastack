@@ -8,7 +8,7 @@ export class AccessorCookieStorage implements CookieStorage {
   private _getCookie;
   private _setCookie;
 
-  constructor(getCookie: () => string[] | string | null | undefined, setCookie: (cookie: string) => void) {
+  constructor(getCookie: () => readonly string[] | string | null | undefined, setCookie: (cookie: string) => void) {
     this._getCookie = getCookie;
     this._setCookie = setCookie;
   }
