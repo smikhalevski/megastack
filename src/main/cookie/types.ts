@@ -65,51 +65,99 @@ export interface CookieOptions {
 /**
  * Reads and writes cookies.
  */
-export interface CookieStorage {
-  /**
-   * Returns names of all existing cookies.
-   */
-  getNames(): readonly string[];
-
+export interface CookieStorage<Cookies extends Record<string, any> = Record<string, any>> {
   /**
    * Returns all cookies as name-value map.
    */
-  getAll(): Record<string, string>;
+  getAll(): Partial<Cookies>;
 
   /**
-   * Returns a cookie value by name.
+   * Returns names of all existing cookies.
+   */
+  getNames(): Array<keyof Cookies>;
+
+  /**
+   * Returns a cookie value by its name.
    *
    * @param name The cookie name.
    */
-  get(name: string): string | undefined;
+  get<Name extends keyof Cookies>(name: Name): Cookies[Name] | undefined;
 
   /**
-   * Sets the cookie by name.
-   *
-   * If value is `null` or `undefined` then cookie is deleted.
+   * Sets a cookie value by its name.
    *
    * @param name The cookie name.
    * @param value The cookie value.
    * @param options Additional cookie options.
    */
-  set(name: string, value: string | null | undefined, options?: CookieOptions): void;
+  set<Name extends keyof Cookies>(name: Name, value: Cookies[Name], options?: CookieOptions): void;
 
   /**
-   * Returns `true` is a cookie with given name exists.
+   * Returns `true` is a cookie with a given name exists.
    *
    * @param name The cookie name.
    */
-  has(name: string): boolean;
+  has(name: keyof Cookies): boolean;
 
   /**
-   * Deletes cookie by name.
+   * Deletes cookie by its name.
    *
    * @param name The cookie name.
    */
-  delete(name: string): void;
+  delete(name: keyof Cookies): void;
+
+  /**
+   * Deletes all cookies.
+   */
+  clear(): void;
 
   /**
    * Iterates over existing cookies.
    */
-  [Symbol.iterator](): Iterator<[string, string]>;
+  [Symbol.iterator](): Iterator<[string, any]>;
+}
+
+/**
+ * Parses and serializes values.
+ */
+export interface Serializer<T = any> {
+  /**
+   * Parses serialized value.
+   *
+   * @param text The serialized value.
+   */
+  parse(text: string): T;
+
+  /**
+   * Serializes value as a string.
+   *
+   * @param value The value to serialize.
+   */
+  stringify(value: T): string;
+}
+
+/**
+ * Options of {@link createCookieStorage}.
+ */
+export interface CookieStorageOptions {
+  /**
+   * Returns cookies.
+   *
+   * @example
+   * () => document.cookie
+   */
+  getCookie: () => readonly string[] | string | null | undefined;
+
+  /**
+   * Sets a new cookie.
+   *
+   * @example
+   * cookie => document.cookie = cookie
+   */
+  setCookie: (cookie: string) => void;
+
+  /**
+   * Parses and serializes cookie values.
+   */
+  serializer?: Serializer;
 }

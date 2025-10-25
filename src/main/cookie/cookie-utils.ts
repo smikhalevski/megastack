@@ -31,7 +31,7 @@ export function parseCookies(cookie: readonly string[] | string | null | undefin
       continue;
     }
 
-    record[decodeURIComponent(cookie.substring(startIndex, valueIndex).trim())] = decodeURIComponent(
+    record[decodeCookieComponent(cookie.substring(startIndex, valueIndex).trim())] = decodeCookieComponent(
       cookie.substring(valueIndex + 1, endIndex).trim()
     );
   }
@@ -69,7 +69,7 @@ export function getCookieNames(cookie: readonly string[] | string | null | undef
       continue;
     }
 
-    const name = decodeURIComponent(cookie.substring(startIndex, valueIndex).trim());
+    const name = decodeCookieComponent(cookie.substring(startIndex, valueIndex).trim());
 
     if (names.indexOf(name) === -1) {
       names.push(name);
@@ -99,7 +99,7 @@ export function getCookieValue(
     cookie = cookie.join(';');
   }
 
-  name = encodeURIComponent(name);
+  name = encodeCookieComponent(name);
 
   nextCookie: for (let startIndex = 0, endIndex; startIndex < cookie.length; startIndex = endIndex + 1) {
     endIndex = cookie.indexOf(';', startIndex);
@@ -143,12 +143,8 @@ export function getCookieValue(
       }
     }
 
-    return decodeURIComponent(cookie.substring(valueStartIndex, valueEndIndex));
+    return decodeCookieComponent(cookie.substring(valueStartIndex, valueEndIndex));
   }
-}
-
-function isSpaceChar(charCode: number): boolean {
-  return charCode == /* \s */ 32 || charCode === /* \n */ 10 || charCode === /* \t */ 9 || charCode === /* \r */ 13;
 }
 
 /**
@@ -157,7 +153,7 @@ function isSpaceChar(charCode: number): boolean {
  * @returns [`Set-Cookie`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie) header value.
  */
 export function stringifyCookie(name: string, value: string, options?: CookieOptions): string {
-  let cookie = encodeURIComponent(name) + '=' + encodeURIComponent(value);
+  let cookie = encodeCookieComponent(name) + '=' + encodeCookieComponent(value);
 
   if (options === undefined) {
     return cookie;
@@ -202,4 +198,16 @@ export function stringifyCookie(name: string, value: string, options?: CookieOpt
   }
 
   return cookie;
+}
+
+function isSpaceChar(charCode: number): boolean {
+  return charCode == /* \s */ 32 || charCode === /* \n */ 10 || charCode === /* \t */ 9 || charCode === /* \r */ 13;
+}
+
+function encodeCookieComponent(str: string): string {
+  return str.replace(/;/g, '%3B');
+}
+
+function decodeCookieComponent(str: string): string {
+  return str.replace(/%3B/g, ';');
 }

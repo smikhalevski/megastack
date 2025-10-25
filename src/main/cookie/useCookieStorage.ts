@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 import { CookieStorage } from './types.js';
 
-export const CookieStorageContext = createContext<CookieStorage | null>(null);
+export const CookieStorageContext = createContext<CookieStorage<any> | null>(null);
 
 /**
  * @internal
@@ -11,7 +11,7 @@ CookieStorageContext.displayName = 'CookieStorageContext';
 /**
  * Returns the current cookie storage.
  */
-export function useCookieStorage(): CookieStorage {
+export function useCookieStorage<Cookies extends Record<string, any>>(): CookieStorage<Cookies> {
   const cookieStorage = useContext(CookieStorageContext);
 
   if (cookieStorage === null) {

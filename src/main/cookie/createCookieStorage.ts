@@ -1,53 +1,45 @@
 import { getCookieNames, getCookieValue, parseCookies, stringifyCookie } from './cookie-utils.js';
-import { CookieStorage } from './types.js';
-
-/**
- * Options of {@link createCookieStorage}.
- */
-export interface CookieStorageOptions {
-  /**
-   * Returns cookies.
-   *
-   * @example
-   * () => document.cookie
-   */
-  getCookie: () => readonly string[] | string | null | undefined;
-
-  /**
-   * Sets a new cookie.
-   *
-   * @example
-   * cookie => document.cookie = cookie
-   */
-  setCookie: (cookie: string) => void;
-}
+import { CookieStorage, CookieStorageOptions } from './types.js';
 
 /**
  * Creates a new cookie storage that uses getter and setter to access cookies.
  */
+export function createCookieStorage<Cookies extends Record<string, any>>(
+  options: CookieStorageOptions
+): CookieStorage<Cookies>;
+
 export function createCookieStorage(options: CookieStorageOptions): CookieStorage {
-  const { getCookie, setCookie } = options;
+  const { getCookie, setCookie, serializer } = options;
+
+  const getAll = () => {
+    const record = parseCookies(getCookie());
+
+    if (serializer === undefined) {
+      return record;
+    }
+
+    for (const name in record) {
+      record[name] = serializer.parse(record[name]);
+    }
+
+    return record;
+  };
 
   return {
+    getAll,
+
     getNames() {
       return getCookieNames(getCookie());
     },
 
-    getAll() {
-      return parseCookies(getCookie());
-    },
-
     get(name) {
-      return getCookieValue(getCookie(), name);
+      const value = getCookieValue(getCookie(), name);
+
+      return serializer === undefined || value === undefined ? value : serializer.parse(value);
     },
 
     set(name, value, options) {
-      if (value === null || value === undefined) {
-        value = '';
-        options = { maxAge: 0 };
-      }
-
-      setCookie(stringifyCookie(name, value, options));
+      setCookie(stringifyCookie(name, serializer === undefined ? String(value) : serializer.stringify(value), options));
     },
 
     has(name) {
@@ -58,8 +50,14 @@ export function createCookieStorage(options: CookieStorageOptions): CookieStorag
       setCookie(stringifyCookie(name, '', { maxAge: 0 }));
     },
 
+    clear() {
+      for (const name of getCookieNames(getCookie())) {
+        setCookie(stringifyCookie(name, '', { maxAge: 0 }));
+      }
+    },
+
     *[Symbol.iterator]() {
-      return Object.entries(parseCookies(getCookie()));
+      return Object.entries(getAll());
     },
   };
 }
