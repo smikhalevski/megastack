@@ -60,6 +60,7 @@
     "react-executor": "^0.0.26"
   },
   "dependencies": {
-    "locale-matcher": "^2.2.1"
+    "locale-matcher": "^2.2.1",
+    "whoopie": "^0.0.1"
   }
 }

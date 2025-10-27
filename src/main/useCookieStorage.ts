@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { CookieStorage } from './types.js';
+import { CookieStorage } from 'whoopie';
 
 export const CookieStorageContext = createContext<CookieStorage<any> | null>(null);
 
