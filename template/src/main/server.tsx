@@ -3,15 +3,23 @@ import React from 'react';
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
-import { isBot, parseViteManifest, renderToResponse } from 'megastack/ssr';
-import { createMemoryHistory, jsonSearchParamsSerializer } from 'react-corsair/history';
+import { parseAcceptLanguageHeader, parseViteManifest, renderToResponse } from 'megastack/ssr';
+import { createMemoryHistory } from 'react-corsair/history';
 import { SSRRouter } from 'react-corsair/ssr';
 import { SSRExecutorManager } from 'react-executor/ssr';
 import { App } from './app/App.js';
 import LoadingPage from './app/LoadingPage.js';
 import NotFoundPage from './app/NotFoundPage.js';
 import ErrorPage from './app/ErrorPage.js';
-import { navigableRoutes, ssrStateSerializer, stableKeyIdGenerator } from './shared.js';
+import {
+  cookieSerializer,
+  navigableRoutes,
+  searchParamsSerializer,
+  ssrStateSerializer,
+  stableKeyIdGenerator,
+} from './shared.js';
+import { createCookieStorage } from 'whoopie';
+import { prepareLocaleExecutor } from './app/executors.js';
 
 const { bootstrapModules, prefetchModules, bootstrapCSS } = parseViteManifest(
   '/',
@@ -37,7 +45,7 @@ app.get('/*', c => {
 
   const history = createMemoryHistory({
     initialEntries: [url.pathname + url.search + url.hash],
-    searchParamsSerializer: jsonSearchParamsSerializer,
+    searchParamsSerializer,
   });
 
   const router = new SSRRouter({
@@ -52,23 +60,39 @@ app.get('/*', c => {
     errorComponent: ErrorPage,
   });
 
+  const cookieStorage = createCookieStorage({
+    getCookie() {
+      return c.req.header('Cookie');
+    },
+    setCookie(cookie) {
+      c.res.headers.append('Set-Cookie', cookie);
+    },
+    serializer: cookieSerializer,
+  });
+
+  prepareLocaleExecutor(executorManager, cookieStorage, parseAcceptLanguageHeader(c.req.header('Accept-Language')));
+
   return renderToResponse({
     history,
     router,
     executorManager,
-    headers: {
+    cookieStorage,
+    responseHeaders: {
       'Content-Security-Policy': `default-src 'self' *.github.com *.githubusercontent.com; script-src 'self' 'nonce-${nonce}'`,
     },
     nonce,
     bootstrapModules,
     bootstrapCSS,
     prefetchModules,
-    isBot: isBot(c.req.header('User-Agent')),
+    isBot: false,
     signal: c.req.raw.signal,
     children: <App />,
   });
 });
 
-serve(app);
+serve({
+  port: 3000,
+  fetch: app.fetch,
+});
 
 console.log('Started on http://localhost:3000');

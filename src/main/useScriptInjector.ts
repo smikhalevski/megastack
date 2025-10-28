@@ -1,11 +1,12 @@
 import { createContext, useContext } from 'react';
 
-const ScriptInjectorContext = createContext<((scriptSource: string) => void) | null>(null);
+export const ScriptInjectorContext = createContext<((scriptSource: string) => void) | null>(null);
 
 ScriptInjectorContext.displayName = 'ScriptInjectorContext';
 
-export const ScriptInjectorProvider = ScriptInjectorContext.Provider;
-
+/**
+ * Returns a callback that injects a `<script>` tag into an SSR-rendered stream.
+ */
 export function useScriptInjector(): ((scriptSource: string) => void) | null {
   return useContext(ScriptInjectorContext);
 }

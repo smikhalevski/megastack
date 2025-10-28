@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { parseAcceptLanguageHeader } from '../../main/locale/parseAcceptLanguageHeader.js';
+import { parseAcceptLanguageHeader } from '../../main/ssr/parseAcceptLanguageHeader.js';
 
 test('parses accept language header value', () => {
   expect(parseAcceptLanguageHeader(undefined)).toStrictEqual([]);

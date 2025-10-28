@@ -3,20 +3,25 @@ import { createRoot, hydrateRoot } from 'react-dom/client';
 import { History, HistoryProvider } from 'react-corsair/history';
 import { hydrateRouter, Router, RouterProvider, Serializer } from 'react-corsair';
 import { ExecutorManager, ExecutorManagerProvider, hydrateExecutorManager } from 'react-executor';
+import { CookieStorageContext } from './useCookieStorage.js';
+import { CookieStorage } from 'whoopie';
 
 export interface RenderClientOptions {
   history: History;
   router: Router;
   executorManager: ExecutorManager;
+  cookieStorage: CookieStorage;
   isHydrated?: boolean;
   serializer?: Serializer;
   children?: ReactNode;
 }
 
 export function renderClient(options: RenderClientOptions): void {
-  const { history, router, executorManager, isHydrated, serializer, children } = options;
+  const { history, router, executorManager, cookieStorage, isHydrated, serializer, children } = options;
 
-  history.subscribe(() => router.navigate(history.location));
+  history.subscribe(() => {
+    router.navigate(history.location);
+  });
 
   router.subscribe(event => {
     if (event.type === 'redirect') {
@@ -25,19 +30,22 @@ export function renderClient(options: RenderClientOptions): void {
   });
 
   const element = (
-    <HistoryProvider value={history}>
-      <RouterProvider value={router}>
-        <ExecutorManagerProvider value={executorManager}>{children}</ExecutorManagerProvider>
-      </RouterProvider>
-    </HistoryProvider>
+    <CookieStorageContext value={cookieStorage}>
+      <HistoryProvider value={history}>
+        <RouterProvider value={router}>
+          <ExecutorManagerProvider value={executorManager}>{children}</ExecutorManagerProvider>
+        </RouterProvider>
+      </HistoryProvider>
+    </CookieStorageContext>
   );
 
   if (isHydrated) {
     hydrateExecutorManager(executorManager, { serializer });
     hydrateRouter(router, history.location, { serializer });
     hydrateRoot(document, element);
-  } else {
-    router.navigate(history.location);
-    createRoot(document).render(element);
+    return;
   }
+
+  router.navigate(history.location);
+  createRoot(document).render(element);
 }

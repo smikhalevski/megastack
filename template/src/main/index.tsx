@@ -5,15 +5,23 @@ import NotFoundPage from './app/NotFoundPage.js';
 import LoadingPage from './app/LoadingPage.js';
 import ErrorPage from './app/ErrorPage.js';
 import React from 'react';
-import { createBrowserHistory, jsonSearchParamsSerializer } from 'react-corsair/history';
+import { createBrowserHistory } from 'react-corsair/history';
 import { ExecutorManager } from 'react-executor';
 import { Router } from 'react-corsair';
-import { navigableRoutes, ssrStateSerializer, stableKeyIdGenerator } from './shared.js';
+import {
+  cookieSerializer,
+  navigableRoutes,
+  searchParamsSerializer,
+  ssrStateSerializer,
+  stableKeyIdGenerator,
+} from './shared.js';
 import { enableDevtool } from 'mfml/react';
-import messagesMetadata from '@mfml/messages/metadata';
+import { debugInfo } from '@mfml/messages/metadata';
+import { createCookieStorage } from 'whoopie';
+import { prepareLocaleExecutor } from './app/executors.js';
 
 if (import.meta.env.DEV) {
-  enableDevtool(messagesMetadata);
+  enableDevtool(debugInfo);
 }
 
 const executorManager = new ExecutorManager({
@@ -21,7 +29,7 @@ const executorManager = new ExecutorManager({
 });
 
 const history = createBrowserHistory({
-  searchParamsSerializer: jsonSearchParamsSerializer,
+  searchParamsSerializer,
 });
 
 history.start();
@@ -42,10 +50,23 @@ router.subscribe(event => {
   }
 });
 
+const cookieStorage = createCookieStorage({
+  getCookie() {
+    return document.cookie;
+  },
+  setCookie(cookie) {
+    document.cookie = cookie;
+  },
+  serializer: cookieSerializer,
+});
+
+prepareLocaleExecutor(executorManager, cookieStorage, navigator.languages);
+
 renderClient({
   executorManager,
   history,
   router,
+  cookieStorage,
   isHydrated: document.documentElement.getAttribute('data-static') === null,
   serializer: ssrStateSerializer,
   children: <App />,

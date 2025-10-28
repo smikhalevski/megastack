@@ -7,17 +7,38 @@ import {
   useExecutorSuspense,
 } from 'react-executor';
 import { notFound } from 'react-corsair';
+import { CookieStorage } from 'whoopie';
+import { pickLocale } from 'locale-matcher';
+import { supportedLocales } from '@mfml/messages/metadata';
+
+const LOCALE_COOKIE = 'locale';
+const LOCALE_EXECUTOR_KEY = 'locale';
 
 export function useLocale(): [locale: string, setLocale: (locale: string) => void] {
-  const localeExecutor = getLocaleExecutor(useExecutorManager());
-
-  useExecutorSubscription(localeExecutor);
+  const localeExecutor = useExecutor(LOCALE_EXECUTOR_KEY);
 
   return [localeExecutor.get(), localeExecutor.resolve];
 }
 
-export function getLocaleExecutor(executorManager: ExecutorManager): Executor<string> {
-  return executorManager.getOrCreate(['locale'], 'en-US');
+export function prepareLocaleExecutor(
+  executorManager: ExecutorManager,
+  cookieStorage: CookieStorage,
+  userLanguages: readonly string[]
+): void {
+  let locale = cookieStorage.get(LOCALE_COOKIE);
+
+  if (!supportedLocales.includes(locale)) {
+    locale = pickLocale(userLanguages, supportedLocales, supportedLocales[0] || 'en');
+  }
+
+  executorManager.getOrCreate(LOCALE_EXECUTOR_KEY, locale, [
+    executor =>
+      executor.subscribe(event => {
+        if (event.type === 'fulfilled') {
+          cookieStorage.set(LOCALE_COOKIE, event.target.value);
+        }
+      }),
+  ]);
 }
 
 export namespace GitHub {

@@ -7,17 +7,20 @@ import { SSRExecutorManager } from 'react-executor/ssr';
 import { RenderToReadableStreamOptions } from 'react-dom/server';
 import { Redirect, RouterProvider, To } from 'react-corsair';
 import { ExecutorManagerProvider } from 'react-executor';
-import { ScriptInjectorProvider } from './useScriptInjector.js';
+import { ScriptInjectorContext } from '../useScriptInjector.js';
+import { CookieStorage } from 'whoopie';
+import { CookieStorageContext } from '../useCookieStorage.js';
 
 export interface RenderToResponseOptions extends Omit<RenderToReadableStreamOptions, 'onError'> {
   history: History;
   router: SSRRouter;
   executorManager: SSRExecutorManager;
+  cookieStorage: CookieStorage;
   isBot?: boolean;
   prefetchModules?: string[];
   bootstrapCSS?: string[];
   children?: ReactNode;
-  headers?: HeadersInit;
+  responseHeaders?: HeadersInit;
 }
 
 export async function renderToResponse(options: RenderToResponseOptions): Promise<Response> {
@@ -25,8 +28,9 @@ export async function renderToResponse(options: RenderToResponseOptions): Promis
     history,
     router,
     executorManager,
-    headers: headersInit,
+    cookieStorage,
     prefetchModules,
+    responseHeaders,
     bootstrapCSS,
     signal,
     nonce,
@@ -107,17 +111,19 @@ export async function renderToResponse(options: RenderToResponseOptions): Promis
     ));
 
   const stream = await renderToReadableStream(
-    <HistoryProvider value={history}>
-      <RouterProvider value={router}>
-        <ExecutorManagerProvider value={executorManager}>
-          <ScriptInjectorProvider value={pushScript}>
-            {cssLinks}
-            {prefetchLinks}
-            {children}
-          </ScriptInjectorProvider>
-        </ExecutorManagerProvider>
-      </RouterProvider>
-    </HistoryProvider>,
+    <CookieStorageContext value={cookieStorage}>
+      <HistoryProvider value={history}>
+        <RouterProvider value={router}>
+          <ExecutorManagerProvider value={executorManager}>
+            <ScriptInjectorContext.Provider value={pushScript}>
+              {cssLinks}
+              {prefetchLinks}
+              {children}
+            </ScriptInjectorContext.Provider>
+          </ExecutorManagerProvider>
+        </RouterProvider>
+      </HistoryProvider>
+    </CookieStorageContext>,
     {
       identifierPrefix,
       namespaceURI,
@@ -136,17 +142,15 @@ export async function renderToResponse(options: RenderToResponseOptions): Promis
     }
   );
 
-  const headers = new Headers(headersInit);
-
-  headers.set('Content-Type', 'text/html; charset=utf-8');
-
   if (isBot) {
     await stream.allReady;
-
-    response = new Response(stream, { status, headers });
-  } else {
-    response = new Response(stream.pipeThrough(chunkInjector), { status, headers });
   }
 
-  return response;
+  const headers = new Headers(responseHeaders);
+
+  if (!headers.has('Content-Type')) {
+    headers.set('Content-Type', 'text/html; charset=utf-8');
+  }
+
+  return new Response(stream.pipeThrough(chunkInjector), { status, headers });
 }

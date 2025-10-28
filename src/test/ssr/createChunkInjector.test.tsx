@@ -1,7 +1,7 @@
 import { expect, test, vi } from 'vitest';
 import React, { lazy, Suspense } from 'react';
 import { renderToReadableStream } from 'react-dom/server.browser';
-import { createChunkInjector } from '../main/ssr/createChunkInjector.js';
+import { createChunkInjector } from '../../main/ssr/createChunkInjector.js';
 
 async function readText(reader: ReadableStreamDefaultReader<Uint8Array>): Promise<string> {
   const decoder = new TextDecoder();

@@ -21,10 +21,9 @@
     "build": "tsc --project tsconfig.build.json && cp -R template lib/template && rimraf --glob 'lib/bin/**/*.d.ts' lib/template/node_modules lib/template/build lib/template/package-lock.json && cp package.json README.md LICENSE.txt lib/ && cd lib && npm pkg delete scripts devDependencies",
     "clean": "rimraf lib docs coverage",
     "test": "vitest run",
-    "test:definitions": "tsd --typings lib/index.d.ts --files src/main/ssr/global.d.ts --files 'src/test/**/*.test-d.ts'",
     "perf": "toofast",
     "docs": "typedoc",
-    "postinstall": "cd template && npm ci && ln -nsf ../../lib node_modules/megastack"
+    "postinstall": "cd template && npm ci && ln -nsf ../../lib node_modules/megastack && rimraf node_modules/react-corsair node_modules/react-executor node_modules/react node_modules/react-dom && npm run build-translations"
   },
   "repository": {
     "type": "git",
@@ -46,7 +45,6 @@
     "@types/react-dom": "^19.2.2",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
-    "tsd": "^0.33.0",
     "tslib": "^2.8.1",
     "typedoc": "^0.28.14",
     "typedoc-plugin-mdn-links": "^5.0.10",
@@ -60,7 +58,6 @@
     "react-executor": "^0.0.26"
   },
   "dependencies": {
-    "locale-matcher": "^2.2.1",
     "whoopie": "^0.0.1"
   }
 }

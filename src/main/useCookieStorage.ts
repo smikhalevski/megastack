@@ -1,11 +1,8 @@
 import { createContext, useContext } from 'react';
-import { CookieStorage } from 'whoopie';
+import type { CookieStorage } from 'whoopie';
 
 export const CookieStorageContext = createContext<CookieStorage<any> | null>(null);
 
-/**
- * @internal
- */
 CookieStorageContext.displayName = 'CookieStorageContext';
 
 /**
