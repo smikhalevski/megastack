@@ -14,11 +14,7 @@ export function parseAcceptLanguageHeader(headerValue: readonly string[] | strin
   }
 
   if (Array.isArray(headerValue)) {
-    for (let i = 0; i < headerValue.length; ++i) {
-      parseAcceptLanguageHeader(headerValue[i]);
-    }
-
-    return getLocales();
+    headerValue = headerValue.join(',');
   }
 
   localeWeights.clear();
@@ -68,14 +64,10 @@ export function parseAcceptLanguageHeader(headerValue: readonly string[] | strin
     localeWeights.set(locale, weight === weight ? weight : 1);
   }
 
-  return getLocales();
+  return Array.from(localeWeights.keys()).sort(compareLocaleWeight);
 }
 
 const localeWeights = new Map<string, number>();
-
-function getLocales(): string[] {
-  return Array.from(localeWeights.keys()).sort(compareLocaleWeight);
-}
 
 function compareLocaleWeight(a: string, b: string): number {
   return localeWeights.get(b)! - localeWeights.get(a)!;
