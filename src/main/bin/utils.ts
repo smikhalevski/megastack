@@ -1,4 +1,7 @@
+import fs from 'node:fs';
 import { bgRed, blue, bold, dim, echo, inverse, underline, white } from './echo.js';
+
+export const megastackPackageJSON = JSON.parse(fs.readFileSync('../package.json', 'utf8'));
 
 export function echoLogo(): void {
   echo(`
@@ -11,7 +14,8 @@ export function echoLogo(): void {
 export function echoHelp(): void {
   echoLogo();
   echo(`
-megastack init: Initialize a new Megastack project.
+megastack: Megastack project configurator — version ${megastackPackageJSON.version}.
+
 
 ${dim('megastack init')} [...options]
 
@@ -19,8 +23,10 @@ ${dim('--packageManager')}  Package manager for installing dependencies.
                   Default: npm
 
    ${dim('--packageName')}  Project package name.
+                  Default: template
 
         ${dim('--outDir')}  Directory to output the project.
+                  Default: cwd
 
          ${dim('--force')}  Overwrite existing files.
 

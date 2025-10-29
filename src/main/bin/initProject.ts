@@ -1,5 +1,5 @@
 import fs from 'node:fs/promises';
-import { echoLogo, formatLink, formatStep } from './utils.js';
+import { echoLogo, formatLink, formatStep, megastackPackageJSON } from './utils.js';
 import { dim, echo } from './echo.js';
 import { execSync } from 'node:child_process';
 import type { CLIOptions } from './megastack.js';
@@ -26,7 +26,6 @@ export async function initProject(templateDir: string, options: CLIOptions): Pro
   process.chdir(outDir);
 
   const packageJSON = JSON.parse(await fs.readFile('package.json', 'utf8'));
-  const megastackPackageJSON = JSON.parse(await fs.readFile('../package.json', 'utf8'));
 
   packageJSON.name = packageName;
   packageJSON.dependencies.megastack = '^' + megastackPackageJSON.version;
